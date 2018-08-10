@@ -18,8 +18,28 @@ public class TextHighlighter {
   private BackgroundColorSpan bgColor;
   private boolean bold = false;
   private boolean italic = false;
-  private ArrayList<TextView> textViews = new ArrayList<>();
+  private ArrayList<TextViewState> textViews = new ArrayList<>();
   private String highlightedText = null;
+
+
+  private class TextViewState{
+
+    public TextViewState(TextView textView, boolean highlighted) {
+      this.textView = textView;
+      this.highlighted = highlighted;
+    }
+
+    public TextView getTextView() {
+      return textView;
+    }
+
+    public boolean isHighlighted() {
+      return highlighted;
+    }
+
+    private TextView textView;
+    private boolean highlighted;
+  }
 
   /**
    * Its method will be called to find position of highlighting text.
@@ -169,7 +189,7 @@ public class TextHighlighter {
    */
   public TextHighlighter addTarget(View view) {
     if (view instanceof TextView && !textViews.contains(view)) {
-      textViews.add((TextView) view);
+      textViews.add(new TextViewState((TextView) view, false));
     }
     return this;
   }
@@ -195,11 +215,10 @@ public class TextHighlighter {
       return;
     }
 
-    int highlighted_tag = keyword.hashCode();
-    for (TextView textView : textViews) {
-      if (textView.getTag(highlighted_tag) == null) {
-        textView.setTag(highlighted_tag, "");
-        highlightTextView(textView, keyword, matcher);
+    for (TextViewState textViewState : textViews) {
+      if (!textViewState.isHighlighted()) {
+        highlightTextView(textViewState.getTextView(), keyword, matcher);
+        textViewState.highlighted = true;
       }
     }
   }
@@ -283,8 +302,9 @@ public class TextHighlighter {
   }
 
   private void reset() {
-    for (TextView textView : textViews) {
-      resetTextView(textView);
+    for (TextViewState textViewState : textViews) {
+      resetTextView(textViewState.getTextView());
+      textViewState.highlighted = false;
     }
   }
 }
