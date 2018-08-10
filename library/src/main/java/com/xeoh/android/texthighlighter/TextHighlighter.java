@@ -11,6 +11,9 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class TextHighlighter {
@@ -18,28 +21,8 @@ public class TextHighlighter {
   private BackgroundColorSpan bgColor;
   private boolean bold = false;
   private boolean italic = false;
-  private ArrayList<TextViewState> textViews = new ArrayList<>();
+  private Map<TextView, Boolean> textViews = new HashMap<>();
   private String highlightedText = null;
-
-
-  private class TextViewState{
-
-    public TextViewState(TextView textView, boolean highlighted) {
-      this.textView = textView;
-      this.highlighted = highlighted;
-    }
-
-    public TextView getTextView() {
-      return textView;
-    }
-
-    public boolean isHighlighted() {
-      return highlighted;
-    }
-
-    private TextView textView;
-    private boolean highlighted;
-  }
 
   /**
    * Its method will be called to find position of highlighting text.
@@ -188,8 +171,8 @@ public class TextHighlighter {
    * @return itself
    */
   public TextHighlighter addTarget(View view) {
-    if (view instanceof TextView && !textViews.contains(view)) {
-      textViews.add(new TextViewState((TextView) view, false));
+    if (view instanceof TextView && !textViews.containsKey(view)) {
+      textViews.put((TextView) view, false);
     }
     return this;
   }
@@ -198,7 +181,7 @@ public class TextHighlighter {
    * Remove all targeted TextView.
    */
   public void resetTargets() {
-    this.textViews = new ArrayList<>();
+    this.textViews = new HashMap<>();
   }
 
   /**
@@ -215,10 +198,10 @@ public class TextHighlighter {
       return;
     }
 
-    for (TextViewState textViewState : textViews) {
-      if (!textViewState.isHighlighted()) {
-        highlightTextView(textViewState.getTextView(), keyword, matcher);
-        textViewState.highlighted = true;
+    for (TextView textView : textViews.keySet()) {
+      if (!textViews.get(textView)) {
+        highlightTextView(textView, keyword, matcher);
+        textViews.put(textView, true);
       }
     }
   }
@@ -302,9 +285,9 @@ public class TextHighlighter {
   }
 
   private void reset() {
-    for (TextViewState textViewState : textViews) {
-      resetTextView(textViewState.getTextView());
-      textViewState.highlighted = false;
+    for (TextView textView : textViews.keySet()) {
+      resetTextView(textView);
+      textViews.put(textView, false);
     }
   }
 }
