@@ -171,7 +171,7 @@ public class TextHighlighter {
    * @return itself
    */
   public TextHighlighter addTarget(View view) {
-    if (view instanceof TextView && !textViews.containsKey(view)) {
+    if (view instanceof TextView) {
       textViews.put((TextView) view, false);
     }
     return this;
