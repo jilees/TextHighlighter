@@ -195,8 +195,12 @@ public class TextHighlighter {
       return;
     }
 
+    int highlighted_tag = keyword.hashCode();
     for (TextView textView : textViews) {
-      highlightTextView(textView, keyword, matcher);
+      if (textView.getTag(highlighted_tag) == null) {
+        textView.setTag(highlighted_tag, "");
+        highlightTextView(textView, keyword, matcher);
+      }
     }
   }
 
